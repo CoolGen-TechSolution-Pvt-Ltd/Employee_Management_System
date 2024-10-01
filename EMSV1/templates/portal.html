@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Portal</title>
+    <style>
+         body {
+            font-family: Arial, sans-serif;
+            background-image: url("{{ url_for('static', filename='addempimage.jpg') }}");
+            background-size: cover;
+            background-position: center;
+            color: #47013F;
+        }
+        .container {
+            width: 500px;
+            left: 30%;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+        }
+        h1 {
+            color: #f11919;
+            text-shadow: #fd3c3c;
+        }
+        label {
+            color: rgb(82, 78, 79);
+            display: block;
+            margin: 10px 0 5px;
+            font-weight: bold;
+        }
+        input, select {
+            width: 70%; 
+            padding: 10px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            border: 1px solid #4e4c4c;
+            box-sizing: border-box; 
+        }
+        button {
+            background-color: red;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 5px;
+        }
+        button:hover {
+            background-color: #DB6A6A;
+        }
+        .error {
+            color: red;
+            font-size: 12px;
+            margin-top: -15px;
+            margin-bottom: 10px;
+            display: none;
+        }
+        .logo {
+            position: absolute;
+            top: 20px; 
+            right: 20px; 
+            max-width: 120px; 
+            z-index: 10; 
+        }
+    </style>
+</head>
+<body>
+    
+    <img class="logo" src="{{ url_for('static', filename='CoolgenLogo.png') }}" alt="Company Logo">
+    <div class="container">
+        <h1>Add Employee - EMS</h1>
+        
+        <label for="employee_id">Employee ID</label>
+        <input type="text" id="employee_id" name="employee_id" placeholder="Enter Employee ID">
+        <div class="error" id="employee_id_error">Employee ID must start with 'EMP'</div>
+        
+        <label for="employee_name">Employee Name</label>
+        <input type="text" id="employee_name" name="employee_name" placeholder="Enter Employee Name">
+        <div class="error" id="employee_name_error">Employee Name should not contain numbers</div>
+
+        <label for="designation">Designation</label>
+        <select id="designation" name="designation">
+            <option value="Web Developer">Web Developer</option>
+            <option value="Cloud Architect">Cloud Architect</option>
+            <option value="Data Scientist">Data Scientist</option>
+            <option value="Business Analyst">Business Analyst</option>
+            <option value="AI Engineer">AI Engineer</option>
+        </select>
+        
+        
+        <label for="contact_no">Contact Number</label>
+        <input type="text" id="contact_no" name="contact_no" placeholder="Enter Contact Number">
+        <div class="error" id="contact_no_error">Please enter a valid 10-digit Contact Number</div>
+        
+       
+        <label for="doj">Date of Joining</label>
+        <input type="date" id="doj" name="doj">
+        <div class="error" id="doj_error">Please select a Date of Joining</div>
+        
+        
+        <label for="month_name">Month Name</label>
+        <select id="month_name" name="month_name">
+            <option value="January">January</option>
+            <option value="February">February</option>
+            <option value="March">March</option>
+            <option value="April">April</option>
+            <option value="May">May</option>
+            <option value="June">June</option>
+            <option value="July">July</option>
+            <option value="August">August</option>
+            <option value="September">September</option>
+            <option value="October">October</option>
+            <option value="November">November</option>
+            <option value="December">December</option>
+        </select>
+        <div class="error" id="month_name_error">Please select a Month</div>
+
+       
+        <label for="ctc">CTC</label>
+        <input type="number" id="ctc" name="ctc" placeholder="Enter CTC">
+        <div class="error" id="ctc_error">Please enter a valid CTC</div>
+
+        
+        <label for="adhar_no">Adhar Number</label>
+        <input type="text" id="adhar_no" name="adhar_no" placeholder="Enter Adhar Number">
+        <div class="error" id="adhar_no_error">Adhar Number must be 12 digits</div>
+        
+        
+        <button type="button" onclick="handleActions()">Add Employee</button>
+        <button type="button" onclick="goToNext()">Update / Delete / Next</button>
+        <button type="button" onclick="goBack()">Back</button>
+        
+    </div>
+
+    <script>
+        function handleActions() {
+            if (validateForm()) {
+                const submitButton = document.querySelector('button[type="button"]');
+                submitButton.disabled = true; // Disable button during submission
+                submitButton.textContent = 'Submitting...'; // Change button text
+
+                const employeeID = document.getElementById('employee_id').value;
+                const employeeName = document.getElementById('employee_name').value;
+                const designation = document.getElementById('designation').value;
+                const contactNo = document.getElementById('contact_no').value;
+                const doj = document.getElementById('doj').value;
+                const monthName = document.getElementById('month_name').value;  
+                const ctc = document.getElementById('ctc').value;
+                const adharNo = document.getElementById('adhar_no').value;
+
+                const formData = new FormData();
+                formData.append('employee_id', employeeID);
+                formData.append('employee_name', employeeName);
+                formData.append('designation', designation);
+                formData.append('contact_no', contactNo);
+                formData.append('doj', doj);
+                formData.append('month_name', monthName);
+                formData.append('ctc', ctc);
+                formData.append('adhar_no', adharNo);
+
+                fetch('/add_employee', {
+                    method: 'POST',
+                    body: formData
+                }).then(response => response.json())
+                .then(data => {
+                    alert(data.message);
+                    if (data.success) {
+                        window.location.href = "/ems_page";
+                    }
+                }).catch(error => {
+                    console.error('Error:', error);
+                }).finally(() => {
+                    submitButton.disabled = false; // Re-enable button after submission
+                    submitButton.textContent = 'Add Employee'; 
+                });
+            }
+        }
+
+        function goBack() {
+            window.location.href = "{{ url_for('login_page') }}";
+        }
+        function goToNext() {
+            window.location.href = "{{ url_for('ems_page') }}";
+        }
+        function validateForm() {
+            let valid = true;
+            
+            const employeeID = document.getElementById('employee_id').value;
+            const employeeName = document.getElementById('employee_name').value;
+            const contactNo = document.getElementById('contact_no').value;
+            const adharNo = document.getElementById('adhar_no').value;
+            const doj = document.getElementById('doj').value;
+            const monthName = document.getElementById('month_name').value;
+            const ctc = document.getElementById('ctc').value;
+
+            
+            const employeeIDError = document.getElementById('employee_id_error');
+            if (!employeeID.startsWith("EMP")) {
+                employeeIDError.style.display = "block";
+                valid = false;
+            } else {
+                employeeIDError.style.display = "none";
+            }
+
+           
+            const employeeNameError = document.getElementById('employee_name_error');
+            if (/\d/.test(employeeName)) {
+                employeeNameError.style.display = "block";
+                valid = false;
+            } else {
+                employeeNameError.style.display = "none";
+            }
+
+            
+            const contactNoError = document.getElementById('contact_no_error');
+            if (!/^\d{10}$/.test(contactNo)) {
+                contactNoError.style.display = "block";
+                valid = false;
+            } else {
+                contactNoError.style.display = "none";
+            }
+
+            
+            const adharNoError = document.getElementById('adhar_no_error');
+            if (!/^\d{12}$/.test(adharNo)) {
+                adharNoError.style.display = "block";
+                valid = false;
+            } else {
+                adharNoError.style.display = "none";
+            }
+
+           
+            const dojError = document.getElementById('doj_error');
+            if (!doj) {
+                dojError.style.display = "block";
+                valid = false;
+            } else {
+                dojError.style.display = "none";
+            }
+
+           
+            const monthNameError = document.getElementById('month_name_error');
+            if (!monthName) {
+                monthNameError.style.display = "block";
+                valid = false;
+            } else {
+                monthNameError.style.display = "none";
+            }
+
+           
+            const ctcError = document.getElementById('ctc_error');
+            if (isNaN(ctc) || ctc <= 0) {
+                ctcError.style.display = "block";
+                valid = false;
+            } else {
+                ctcError.style.display = "none";
+            }
+
+            return valid;
+        }
+    </script>
+</body>
+</html>

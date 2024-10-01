@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Management System</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #e0dbdb;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+        .logo {
+            width: 1800px;
+            height: 250px;
+            background-image: url("{{ url_for('static', filename='EMSImage.png') }}");
+            background-size: cover;
+            background-position: center;
+        }
+        .right-frame {
+            width: 1350px;
+            padding: 10px;
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+            margin-right: 10px;
+        }
+        .right-frame input, .right-frame select, .right-frame button {
+            margin: 5px 0;
+            margin-right: 20px;
+            width: 200px;
+            height: auto;
+        }
+        .treeview {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        .treeview th, .treeview td {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+        .treeview th {
+            background-color: #034e7b;
+            color: white;
+        }
+        .button-frame {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 20px;
+            margin-right: 10px;
+        }
+        .button-frame button {
+            background-color: #034e7b;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        .button-frame button:hover {
+            background-color: #DB6A6A;
+        }
+
+        .modal {
+            display: none; 
+            position: fixed; 
+            z-index: 1; 
+            left: 0;
+            top: 0;
+            width: 30%; 
+            height: 100%; 
+            overflow: auto; 
+            background-color: rgba(0, 0, 0, 0.7); 
+   
+}
+
+
+.modal-content {
+    background-color: #fefefe;
+    margin: 15% auto; 
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%; 
+    border-radius: 10px; 
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.modal-content .form-group {
+    margin-bottom: 20px; 
+}
+.modal-content button:hover {
+    background-color:  #DB6A6A;
+}
+     
+
+.modal-content input[type="text"],
+.modal-content input[type="date"],
+.modal-content select {
+    width: 60%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box; 
+}
+.modal-content label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+.close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        h1 {
+            color: #d92525;
+            font-family: 'Goudy Old Style', serif;
+            font-size: 2.5em;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    
+    <div class="container">
+        <div class="logo"></div>
+        <h1>Employee Management System</h1>
+        <div class="right-frame">
+            <div>
+                <label for="searchBox">Search By:</label>
+                <select id="searchBox">
+                    <option value="Employee_Id">Employee_Id</option>
+                    <option value="Employee_Name">Employee_Name</option>
+                    <option value="Designation">Designation</option>
+                    <option value="Contact_No">Contact_No</option>
+                    <option value="Date_Of_Joining">Date_Of_Joining</option>
+                    <option value="Month_Name">Month_Name</option>
+                    <option value="CTC">CTC</option>
+                    <option value="Adhar_No">Adhar_No</option>
+                </select>
+                <input type="text" id="searchEntry" placeholder="Search...">
+                <button onclick="searchEmployee()">Search</button>
+                <button onclick="showAll()">Show All</button>
+                <button onclick="goBack()">Back</button>
+            </div>
+            <table class="treeview">
+                <thead>
+                    <tr>
+                        <th>Select</th>
+                        <th>Employee Id</th>
+                        <th>Employee Name</th>
+                        <th>Designation</th>
+                        <th>Contact No</th>
+                        <th>Date Of Joining</th>
+                        <th>Month Name</th>
+                        <th>CTC</th>
+                        <th>Adhar No</th>
+                    </tr>
+                </thead>
+                <tbody id="employeeTableBody">
+                    {% for employee in employees %}
+                    <tr>
+                        <td><input type="checkbox" name="select_employee" value="{{ employee[0] }}"></td>
+                        <td>{{ employee[0] }}</td>
+                        <td>{{ employee[1] }}</td>
+                        <td>{{ employee[2] }}</td>
+                        <td>{{ employee[3] }}</td>
+                        <td>{{ employee[4] }}</td>
+                        <td>{{ employee[5] }}</td>
+                        <td>{{ employee[6] }}</td>
+                        <td>{{ employee[7] }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="button-frame">
+            <button onclick="editEmployee()">Update Employee</button>
+            <button onclick="deleteEmployee()">Delete Employee</button>
+            <button onclick="deleteAll()">Delete All</button>
+            <button onclick="downloadReport()">Download Report</button>
+            <label for="fileFormat"style="color: #034e7b; background-color: #034e7b;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;" >Select File Format:</label>
+            <select id="fileFormat" style="color: #034e7b;   background-color: #034e7b;
+            color: white;
+            border: none;
+            
+            border-radius: 5px;">
+            
+                <option value="csv">CSV</option>
+                <option value="pdf">PDF</option>
+            </select>
+       
+    </div>
+</div>
+  
+<div id="editModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <h2 style="color: #ca2323;">Edit Employee</h2>
+        <form id="editEmployeeForm" onsubmit="submitForm(event)">
+            <label for="Employee_Id">Employee ID:</label>
+            <input type="text" id="Employee_Id" name="Employee_Id" placeholder="Enter Employee ID" required>
+            <br>
+            <br>
+            <label for="Employee_Name">Employee Name:</label>
+            <input type="text" id="Employee_Name" name="Employee_Name" required>
+            <br>
+            <br>
+            <label for="Designation">Designation:</label>
+            <select id="Designation" name="Designation" required>
+                <option value="Web Developer">Web Developer</option>
+                <option value="Cloud Architect">Cloud Architect</option>
+                <option value="Data Scientist">Data Scientist</option>
+                <option value="Business Analyst">Business Analyst</option>
+                <option value="AI Engineer">AI Engineer</option>
+            </select>
+            <br>
+            <br>
+            <label for="Contact_No">Contact No:</label>
+            <input type="text" id="Contact_No" name="Contact_No" pattern="\d{10}" required>
+            <br>
+            <br>
+            <label for="Date_Of_Joining">Date of Joining:</label>
+            <input type="date" id="Date_Of_Joining" name="Date_Of_Joining" required>
+            <br>
+            <br>
+            <label for="Month_Name">Month Name:</label>
+            <select id="Month_Name" name="Month_Name" required>
+                <option value="January">January</option>
+                <option value="February">February</option>
+                <option value="March">March</option>
+                <option value="April">April</option>
+                <option value="May">May</option>
+                <option value="June">June</option>
+                <option value="July">July</option>
+                <option value="August">August</option>
+                <option value="September">September</option>
+                <option value="October">October</option>
+                <option value="November">November</option>
+                <option value="December">December</option>
+            </select>
+            <br>
+            <br>
+            <label for="CTC">CTC:</label>
+            <input type="text" id="CTC" name="CTC" required>
+            <br>
+            <br>
+            <label for="Adhar_No">Aadhar Number:</label>
+            <input type="text" id="Adhar_No" name="Adhar_No" pattern="\d{12}" required>
+            <br>
+             <br>
+            <button type="submit"style="color: #034e7b; background-color: #034e7b;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;"  >Update Employee</button>
+        </form>
+    </div>
+</div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+    fetch('/get_employees')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(employees => {
+            const tableBody = document.getElementById('employeeTableBody');
+            tableBody.innerHTML = '';  
+
+            employees.forEach(employee => {
+                const row = tableBody.insertRow();
+                row.innerHTML = `
+                    <td><input type="checkbox" name="select_employee" value="${employee.Employee_Id}" onclick="handleCheckboxClick(this)"></td>
+                    <td>${employee.Employee_Id}</td>
+                    <td>${employee.Employee_Name}</td>
+                    <td>${employee.Designation}</td>
+                    <td>${employee.Contact_No}</td>
+                    <td>${formatDate(employee.Date_Of_Joining)}</td>
+                    <td>${employee.Month_Name}</td>
+                    <td>${employee.CTC}</td>
+                    <td>${employee.Adhar_No}</td>
+                `;
+            });
+        })
+        .catch(error => {
+            console.error('Error fetching employee data:', error);
+        });
+});
+
+
+
+function formatDate(dateString) {
+    const options = { year: 'numeric', month: '2-digit', day: '2-digit' };
+    return new Date(dateString).toLocaleDateString('en-US', options);
+}
+        
+    function searchEmployee() {
+    const searchKey = document.getElementById('searchBox').value.trim();
+    const searchValue = document.getElementById('searchEntry').value.trim();
+
+    
+    if (!searchKey || !searchValue) {
+        alert("Please enter both search key and value.");
+        return;
+    }
+    
+
+    
+    const isEmployeeIdSearch = searchKey === 'Employee_Id';
+
+    fetch(`/search_employees?key=${searchKey}&value=${searchValue}`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error("Network response was not ok");
+            }
+            return response.json();
+        })
+        .then(employees => {
+            const tableBody = document.getElementById('employeeTableBody');
+            tableBody.innerHTML = '';  
+
+            
+            if (employees.length === 0) {
+                tableBody.innerHTML = '<tr><td colspan="9">No employees found.</td></tr>';
+                return;
+            }
+            function formatDate(dateString) {
+    const options = { year: 'numeric', month: '2-digit', day: '2-digit' };
+    return new Date(dateString).toLocaleDateString('en-US', options);
+}
+
+           
+employees.forEach(employee => {
+    const row = tableBody.insertRow();
+    row.innerHTML = `
+        <td><input type="checkbox" name="select_employee" value="${employee.Employee_Id}"></td>
+        <td>${employee.Employee_Id}</td>
+        <td>${employee.Employee_Name}</td>
+        <td>${employee.Designation}</td>
+        <td>${employee.Contact_No}</td>
+        <td>${formatDate(employee.Date_Of_Joining)}</td> <!-- Format date here -->
+        <td>${employee.Month_Name}</td>
+        <td>${employee.CTC}</td>
+        <td>${employee.Adhar_No}</td>
+                `;
+            });
+        })
+        .catch(error => console.error('Error searching employee:', error));
+}
+
+function showAll() {
+    fetch('/show_all_employees')
+        .then(response => response.json())
+        .then(employees => {
+            const tableBody = document.getElementById('employeeTableBody');
+            tableBody.innerHTML = ''; 
+
+            employees.forEach(employee => {
+               
+                const date = new Date(employee.Date_Of_Joining);
+                const formattedDate = date.toISOString().split('T')[0];  
+
+                const row = tableBody.insertRow();
+                row.innerHTML = `
+                    <td><input type="checkbox" name="select_employee" value="${employee.Employee_Id}"></td>
+                    <td>${employee.Employee_Id}</td>
+                    <td>${employee.Employee_Name}</td>
+                    <td>${employee.Designation}</td>
+                    <td>${employee.Contact_No}</td>
+                    <td>${formattedDate}</td>  <!-- Use formatted date -->
+                    <td>${employee.Month_Name}</td>
+                    <td>${employee.CTC}</td>
+                    <td>${employee.Adhar_No}</td>
+                `;
+            });
+        })
+        .catch(error => console.error('Error fetching all employees:', error));
+}
+
+function editEmployee() {
+    const selectedCheckboxes = document.querySelectorAll('input[name="select_employee"]:checked');
+    
+    if (selectedCheckboxes.length !== 1) {
+        alert("Please select one employee to edit.");
+        return;
+    }
+    
+    const employeeId = selectedCheckboxes[0].value;
+
+   
+    fetch(`/get_employee_details?employee_id=${employeeId}`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`Error fetching employee: ${response.statusText}`);
+            }
+            return response.json();
+        })
+        .then(employee => {
+            if (employee.error) {
+                throw new Error(employee.error);
+            }
+           
+            document.getElementById('Employee_Id').value = employee.Employee_Id;
+            document.getElementById('Employee_Name').value = employee.Employee_Name;
+            document.getElementById('Designation').value = employee.Designation;
+            document.getElementById('Contact_No').value = employee.Contact_No;
+            document.getElementById('Month_Name').value = employee.Month_Name;
+            document.getElementById('CTC').value = employee.CTC;
+            document.getElementById('Adhar_No').value = employee.Adhar_No;
+            
+           
+            const dateOfJoining = employee.Date_Of_Joining;
+            if (dateOfJoining) {
+                document.getElementById('Date_Of_Joining').value = dateOfJoining;
+            } else {
+                document.getElementById('Date_Of_Joining').value = ''; 
+            }
+
+         
+            document.getElementById('editModal').style.display = 'block';
+        })
+        .catch(error => {
+            console.error('Error fetching employee data:', error);
+            alert('Failed to fetch employee');
+        });
+}
+
+
+    
+    function closeModal() {
+        document.getElementById('editModal').style.display = 'none';
+    }
+
+function validateInput() {
+    const name = document.getElementById('Employee_Name').value.trim();
+    const contactNo = document.getElementById('Contact_No').value.trim();
+    const adharNo = document.getElementById('Adhar_No').value.trim();
+    const ctc = document.getElementById('CTC').value.trim();
+
+    
+    if (!name) {
+        alert("Employee Name is required.");
+        return false;
+    }
+    if (!/^[a-zA-Z\s]+$/.test(name)) {
+        alert("Employee Name should only contain letters and spaces.");
+        return false;
+    }
+
+    
+    if (!contactNo) {
+        alert("Contact Number is required.");
+        return false;
+    }
+    if (!/^\d{10}$/.test(contactNo)) {
+        alert("Contact Number must be 10 digits long.");
+        return false;
+    }
+
+    
+    if (!adharNo) {
+        alert("Aadhar Number is required.");
+        return false;
+    }
+    if (!/^\d{12}$/.test(adharNo)) {
+        alert("Aadhar Number must be 12 digits long.");
+        return false;
+    }
+
+    
+    if (!ctc) {
+        alert("CTC is required.");
+        return false;
+    }
+    if (isNaN(ctc) || ctc <= 0) {
+        alert("CTC must be a positive number.");
+        return false;
+    }
+
+    return true;
+}
+function submitForm(event) {
+    event.preventDefault(); 
+
+    
+    if (!validateInput()) {
+        return; 
+    }
+
+   
+    const formData = {
+        Employee_Id: document.getElementById('Employee_Id').value.trim(),
+        Employee_Name: document.getElementById('Employee_Name').value.trim(),
+        Designation: document.getElementById('Designation').value,
+        Contact_No: document.getElementById('Contact_No').value.trim(),
+        Date_Of_Joining: document.getElementById('Date_Of_Joining').value,
+        Month_Name: document.getElementById('Month_Name').value,
+        CTC: document.getElementById('CTC').value.trim(),
+        Adhar_No: document.getElementById('Adhar_No').value.trim(),
+    };
+
+    console.log(formData); 
+
+    fetch('/update_employee', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(formData)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert("Employee updated successfully.");
+            
+            location.reload(); 
+        } else {
+            alert("Error updating employee: " + data.message);
+        }
+    })
+    .catch(error => {
+        console.error("Error:", error);
+    });
+}
+
+
+function updateEmployeeInTable(employeeData) {
+   
+    const tableRows = document.querySelectorAll('#employeeTableBody tr');
+    tableRows.forEach(row => {
+        const cell = row.querySelector('td:nth-child(2)'); 
+        if (cell && cell.textContent === employeeData.Employee_Id) {
+           
+            row.cells[2].textContent = employeeData.Employee_Name; 
+            row.cells[3].textContent = employeeData.Designation;   
+            row.cells[4].textContent = employeeData.Contact_No;   
+            row.cells[5].textContent = employeeData.Date_Of_Joining; 
+            row.cells[6].textContent = employeeData.Month_Name;    
+            row.cells[7].textContent = employeeData.CTC;          
+            row.cells[8].textContent = employeeData.Adhar_No;     
+        }
+    });
+}
+
+
+
+
+function deleteEmployee() {
+    const selectedCheckboxes = document.querySelectorAll('input[name="select_employee"]:checked');
+    
+    if (selectedCheckboxes.length === 0) {
+        alert('Please select at least one employee to delete.');
+        return;
+    }
+
+    const employeeIds = Array.from(selectedCheckboxes).map(cb => cb.value);
+
+    fetch('/delete_employee', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ ids: employeeIds }),  
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Employee(s) deleted successfully!');
+            showAll(); 
+        } else {
+            alert('Failed to delete employee(s): ' + data.message);
+        }
+    })
+    .catch(error => console.error('Error deleting employee(s):', error));
+}
+
+function deleteAll() {
+    fetch('/delete_all_employees', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({})
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok: ' + response.statusText);
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.success) {
+            alert('All employees deleted successfully!');
+            showAll(); 
+        } else {
+            alert('Failed to delete all employees: ' + data.message);
+        }
+    })
+    .catch(error => console.error('Error deleting all employees:', error));
+}
+
+        
+        function downloadReport() {
+    
+    const format = document.getElementById('fileFormat').value;
+
+    
+    const selectedEmployees = [];
+    document.querySelectorAll('input[name="select_employee"]:checked').forEach(checkbox => {
+        selectedEmployees.push(checkbox.value);
+    });
+
+    
+    if (selectedEmployees.length === 0) {
+        alert("Please select at least one employee and download file format");
+        return;
+    }
+
+    
+    if (format !== 'csv' && format !== 'pdf') {
+        alert("Please select a valid file format.");
+        return;
+    }
+
+   
+    selectedEmployees.forEach(employeeId => {
+        window.open(`/download_report?format=${format}&ids=${employeeId}`, '_blank');
+    });
+
+    setTimeout(() => {
+        alert("Download started for selected employees!");
+    }, 1000);
+}
+
+
+document.getElementById('downloadBtn').addEventListener('click', downloadReport);
+
+        function goBack() {
+            window.history.back();
+        }
+    </script>
+</body>
+</html>
