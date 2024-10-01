@@ -1,0 +1,60 @@
+Need to import::
+
+1. from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, send_file
+Flask Imports
+Flask: Used to create the Flask web application.
+render_template: Renders HTML templates (e.g., for displaying web pages).
+request: Handles incoming HTTP requests.
+redirect: Redirects the user to a different URL.
+url_for: Generates URLs dynamically.
+flash: Shows one-time alert messages (like success or error messages).
+jsonify: Converts Python dictionaries to JSON format (useful for APIs).
+send_file: Sends files (like PDFs or CSVs) as a response.
+
+2. import mysql.connector
+from mysql.connector import Error
+
+MySQL Connector Imports
+mysql.connector: Used for connecting to MySQL databases.
+Error: Handles exceptions that occur during database operations.
+
+3. import re
+
+ Regular Expression
+re: Provides support for regular expressions, typically for input validation or pattern matching.
+
+4. from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import letter
+from reportlab.lib.units import inch
+from reportlab.lib import colors
+from reportlab.lib.colors import HexColor
+
+ReportLab (for PDF Generation)
+canvas: Used to create PDF documents.
+HexColor: Allows defining custom colors in hex format.
+letter: Defines the page size for PDFs (in this case, letter size).
+inch: Used to specify measurements in inches for layout and spacing.
+colors: A module that provides color options for the PDF.
+
+5. from fpdf import FPDF
+
+FPDF (Alternative for PDF Generation)
+FPDF: Another library for generating PDFs. It's often simpler than ReportLab.
+python
+
+6. import io
+   import os
+
+
+File and Directory Handling
+io: Provides tools for handling I/O operations, like reading/writing to files.
+os: Provides functions for interacting with the operating system, such as file handling.
+
+7. import csv
+CSV Handling
+csv: A standard library module to read from and write to CSV files.
+
+8.import datetime
+
+Datetime
+datetime: Provides classes for manipulating dates and times.
